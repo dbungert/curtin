@@ -175,7 +175,7 @@ def main(argv=None):
     paths = util.get_paths()
 
     if paths['helpers'] is None or paths['curtin_exe'] is None:
-        raise OSError("Unable to find helpers or 'curtin' exe to add to path")
+        raise OSError("Unable to find helpers or 'curtin' exe to add to path", helpers)
 
     path = os.environ['PATH'].split(':')
 
