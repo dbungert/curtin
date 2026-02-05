@@ -1438,7 +1438,6 @@ def install_missing_packages(cfg, target, osfamily=DISTROS.debian):
                 needed_packages.add("zfs-initramfs")
             elif "dracut" in installed_packages:
                 needed_packages.add("zfs-dracut")
-                needed_packages.add("systemd-cryptsetup")
             else:
                 raise ValueError(
                     "need matching zfs root filesystem capabilities package "
