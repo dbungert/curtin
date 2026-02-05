@@ -157,10 +157,12 @@ class ZPoolEncryption:
             cmd = ["zfs", "set", keylocation, self.poolname]
             util.subp(cmd, capture=True)
 
+        # with export, run cryptsetup close keystore-rpool
+
         # The keystore crypsetup device needs to be closed so we can (at the
         # end of the install) allow the zpool to complete the export step.
         # Once we have moved the key over we can close the keystore.
-        util.subp(["cryptsetup", "close", dmpath], capture=True)
+        # util.subp(["cryptsetup", "close", dmpath], capture=True)
 
 
 def _join_flags(optflag, params):
