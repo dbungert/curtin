@@ -840,7 +840,9 @@ class TestEnsureOneKernel(CiTestCase):
             pass
         # assert_called_with would be flaky due to unpredictable order of items
         # from the set
-        purged = set(self.m_purge.mock_calls[0].args[0])
+        self.m_purge.assert_called_once()
+        (args, kwargs) = self.m_purge.call_args
+        purged = set(args[0])
         self.assertEqual(set([self.generic_a, self.hwe]), purged)
 
     def test_fewer(self):

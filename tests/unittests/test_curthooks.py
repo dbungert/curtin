@@ -803,8 +803,9 @@ class TestInstallMissingPkgs(CiTestCase):
             cfg, target, osfamily=self.distro_family
         )
         expected_pkgs = ['zfs-initramfs', 'zfsutils-linux']
-        [mock_call] = self.mock_install_packages.mock_calls
-        self.assertEqual(expected_pkgs, sorted(mock_call.args[0]))
+        self.mock_install_packages.assert_called_once()
+        (args, kwargs) = self.mock_install_packages.call_args
+        self.assertEqual(expected_pkgs, sorted(args[0]))
 
     @patch.object(events, 'ReportEventStack')
     def test_zfs_install_on_dracut(self, mock_events):
@@ -827,8 +828,9 @@ class TestInstallMissingPkgs(CiTestCase):
             cfg, target, osfamily=self.distro_family
         )
         expected_pkgs = ['zfs-dracut', 'zfsutils-linux']
-        [mock_call] = self.mock_install_packages.mock_calls
-        self.assertEqual(expected_pkgs, sorted(mock_call.args[0]))
+        self.mock_install_packages.assert_called_once()
+        (args, kwargs) = self.mock_install_packages.call_args
+        self.assertEqual(expected_pkgs, sorted(args[0]))
 
 
 class TestSetupZipl(CiTestCase):
