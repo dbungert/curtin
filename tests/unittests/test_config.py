@@ -215,7 +215,7 @@ class TestDeserializer(CiTestCase):
 
         @attr.s(auto_attribs=True)
         class UnionClass:
-            val: typing.Union[str | list | None]
+            val: typing.Union[str, list, None]
 
         self.assertEqual(
             UnionClass(val="a"),
