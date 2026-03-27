@@ -33,6 +33,8 @@ import sys
 import tempfile
 import time
 
+import attr
+
 
 FstabData = namedtuple(
     "FstabData", ('spec', 'path', 'fstype', 'options', 'freq', 'passno',
@@ -665,16 +667,16 @@ def get_path_to_storage_volume(volume, storage_config):
 DEVS = set()
 
 
-@storage_actions.define("image")
-class Image:
+@attr.s(auto_attribs=True)
+class Image(storage_actions.StorageBaseType):
     path: str
     size: int = storage_actions.size()
     preserve: bool = False
     sector_size: int = storage_actions.size(default=512)
 
 
-@storage_actions.define("device")
-class Device:
+@attr.s(auto_attribs=True)
+class Device(storage_actions.StorageBaseType):
     path: str
 
 
