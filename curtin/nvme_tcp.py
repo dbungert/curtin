@@ -248,6 +248,9 @@ def _deploy_network_up_script(cfg, target: pathlib.Path) -> None:
     curtin_nvme_over_tcp_dir.mkdir(parents=True, exist_ok=True)
     network_up_script = curtin_nvme_over_tcp_dir / 'network-up'
 
+    if not hasattr(shlex, "join"):
+        raise RuntimeError("NVMe-o-TCP requires a newer python version")
+
     network_up_content = '\n'.join(
             [shlex.join(cmd) for cmd in get_ip_commands(cfg)])
 
@@ -258,6 +261,9 @@ def _deploy_connect_nvme_script(cfg, target: pathlib.Path) -> None:
     curtin_nvme_over_tcp_dir = target / 'etc' / 'curtin-nvme-over-tcp'
     curtin_nvme_over_tcp_dir.mkdir(parents=True, exist_ok=True)
     connect_nvme_script = curtin_nvme_over_tcp_dir / 'connect-nvme'
+
+    if not hasattr(shlex, "join"):
+        raise RuntimeError("NVMe-o-TCP requires a newer python version")
 
     connect_nvme_content = '\n'.join(
             [shlex.join(cmd) for cmd in get_nvme_commands(cfg)])

@@ -1,11 +1,12 @@
 # This file is part of curtin. See LICENSE file for copyright and license info.
 
+import sys
 from pathlib import Path
 from unittest.mock import patch, Mock
 
 
 from curtin import nvme_tcp
-from curtin.util import ProcessExecutionError
+from curtin.util import ProcessExecutionError, nullcontext
 from .helpers import CiTestCase
 
 import yaml
@@ -282,10 +283,18 @@ network:
         get_nvme_cmds_sym = "curtin.nvme_tcp.get_nvme_commands"
         get_ip_cmds_sym = "curtin.nvme_tcp.get_ip_commands"
 
-        with (patch(get_nvme_cmds_sym, return_value=nvme_cmds),
-              patch(get_ip_cmds_sym, return_value=ip_cmds)):
-            nvme_tcp.initramfs_tools_configure_no_firmware_support(
-                    {}, target=Path(target))
+        if sys.version_info < (3, 8):
+            shlex_cm = self.assertRaises(RuntimeError)
+            valid = False
+        else:
+            shlex_cm = nullcontext()
+            valid = True
+
+        with patch(get_nvme_cmds_sym, return_value=nvme_cmds):
+            with patch(get_ip_cmds_sym, return_value=ip_cmds):
+                with shlex_cm:
+                    nvme_tcp.initramfs_tools_configure_no_firmware_support(
+                            {}, target=Path(target))
 
         init_premount_dir = 'etc/initramfs-tools/scripts/init-premount'
 
@@ -296,8 +305,8 @@ network:
         connect_nvme_script = Path(
                 target + '/etc/curtin-nvme-over-tcp/connect-nvme')
 
-        self.assertTrue(hook.exists())
-        self.assertTrue(bootscript.exists())
+        self.assertEqual(valid, hook.exists())
+        self.assertEqual(valid, bootscript.exists())
 
         netup_expected_contents = '''\
 #!/bin/sh
@@ -308,7 +317,6 @@ network:
 
 dhcpcd -4 ens3
 '''
-        self.assertEqual(netup_expected_contents, netup_script.read_text())
         connect_nvme_expected_contents = '''\
 #!/bin/sh
 
@@ -318,8 +326,10 @@ dhcpcd -4 ens3
 
 nvme connect-all --transport tcp --traddr 172.16.82.77 --trsvcid 4420
 '''
-        self.assertEqual(connect_nvme_expected_contents,
-                         connect_nvme_script.read_text())
+        if valid:
+            self.assertEqual(netup_expected_contents, netup_script.read_text())
+            self.assertEqual(connect_nvme_expected_contents,
+                             connect_nvme_script.read_text())
 
     def test_configure_nvme_stas(self):
         target = self.tmp_dir()
