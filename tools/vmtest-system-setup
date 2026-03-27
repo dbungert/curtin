@@ -27,6 +27,7 @@ DEPS=(
   python3-jsonschema
   python3-nose
   python3-oauthlib
+  python3-packaging
   python3-parameterized
   python3-pep8
   python3-pip
