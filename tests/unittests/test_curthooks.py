@@ -2977,7 +2977,7 @@ class TestCurthookCloudinit(CiTestCase):
 @patch("curtin.commands.curthooks.platform.machine",
        Mock(return_value="amd64"))
 @patch("curtin.commands.curthooks.events.ReportEventStack",
-       Mock(return_value=contextlib.nullcontext()))
+       Mock(return_value=util.nullcontext()))
 @patch("curtin.commands.curthooks.distro.get_distroinfo")
 class TestBuiltinCurthooks(CiTestCase):
     def test_ubuntu_noble(self, m_distroinfo):
@@ -3051,7 +3051,7 @@ class TestBuiltinCurthooks(CiTestCase):
 @patch("curtin.commands.curthooks.builtin_curthooks")
 @patch("curtin.commands.curthooks.util.EFIVarFSBug", Mock())
 @patch("curtin.commands.curthooks.events.ReportEventStack",
-       Mock(return_value=contextlib.nullcontext()))
+       Mock(return_value=util.nullcontext()))
 class TestCurthooks(CiTestCase):
     def test_ubuntu(
             self, m_builtin_curthooks, m_uc_curthooks, m_is_uc, m_run_hookk):

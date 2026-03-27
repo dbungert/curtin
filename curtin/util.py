@@ -2,6 +2,7 @@
 
 import argparse
 import collections
+import contextlib
 from contextlib import contextmanager, suppress
 import errno
 import fcntl
@@ -1476,5 +1477,19 @@ class FlockEx:
             fcntl.flock(self.lock_fd, fcntl.LOCK_UN)
         with suppress(Exception):
             os.close(self.lock_fd)
+
+
+class _nullcontext:
+    def __init__(self, enter_result=None):
+        self.enter_result = enter_result
+
+    def __enter__(self):
+        return self.enter_result
+
+    def __exit__(self, *args):
+        pass
+
+
+nullcontext = getattr(contextlib, "nullcontext", _nullcontext)
 
 # vi: ts=4 expandtab syntax=python
