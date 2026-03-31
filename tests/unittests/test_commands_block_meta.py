@@ -13,6 +13,8 @@ import os
 import random
 import uuid
 
+import attr
+
 from curtin.block import dasd
 from curtin.commands import block_meta, block_meta_v2
 from curtin import paths, util
@@ -24,6 +26,38 @@ def random_uuid():
 
 
 empty_context = block_meta.BlockMetaContext({})
+
+
+class TestFoo(CiTestCase):
+    def test_foo(self):
+        kwargs = {"id": "a", "path": "/dev"}
+        bd = block_meta.Device(**kwargs, type="device")
+
+        def define(typ):
+            def wrapper(c):
+                c.type = attr.ib(default=typ)
+                c.id = attr.ib()
+                c.__annotations__["id"] = str
+                c.__annotations__["type"] = str
+                c = attr.s(auto_attribs=True, kw_only=True)(c)
+                return c
+            return wrapper
+
+        @define("device")
+        class WrapperDevice:
+            path: str
+            type: str = "device"
+
+        @attr.s(auto_attribs=True)
+        class SimpleDevice:
+            id: str
+            path: str
+            type: str = "device"
+
+        wd = WrapperDevice(**kwargs)
+        sd = SimpleDevice(**kwargs)
+        self.assertEqual(attr.asdict(bd), attr.asdict(wd))
+        self.assertEqual(attr.asdict(sd), attr.asdict(wd))
 
 
 class TestToUTF8HexNotation(CiTestCase):

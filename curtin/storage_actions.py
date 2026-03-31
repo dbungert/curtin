@@ -10,6 +10,9 @@ class StorageBaseType:
     id: str
     type: str
 
+    def __attrs_post_init__(self):
+        assert self.type == type(self).__name__.lower()
+
 
 def _convert_size(s):
     if isinstance(s, str):
