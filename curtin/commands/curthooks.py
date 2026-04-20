@@ -2195,7 +2195,7 @@ def builtin_curthooks(cfg: dict, target: str, state: dict):
 
     if osfamily == DISTROS.debian:
         curthook_zpool_cache(target)
-        curthook_dracut_zvol(target, extract_storage_ordered_dict(cfg))
+        # curthook_dracut_zvol(target, extract_storage_ordered_dict(cfg))
         curthook_zkey(target, osfamily, state)
         curthook_crypttab(target, state)
 
