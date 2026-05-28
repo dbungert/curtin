@@ -18,9 +18,32 @@ so concurrent curtin invocations will not interleave partial records.
 import datetime
 import json
 import os
+import sys
 
 _LOG_PATH = "/var/log/installer/runtime-deps-curtin.ndjson"
 _SOURCE = "curtin"
+
+
+def _capture_callers(skip: int, max_depth: int) -> list:
+    """Return up to max_depth caller frames, skipping the innermost `skip` frames.
+
+    skip=2 when called from log_call() so we discard both _capture_callers and
+    log_call from the output, leaving the first entry as the code that called
+    log_call() (i.e. _subp in util.py).
+    """
+    callers = []
+    try:
+        frame = sys._getframe(skip)
+        while frame is not None and len(callers) < max_depth:
+            callers.append({
+                "file": frame.f_code.co_filename,
+                "line": frame.f_lineno,
+                "func": frame.f_code.co_name,
+            })
+            frame = frame.f_back
+    except ValueError:
+        pass
+    return callers
 
 
 def log_call(argv) -> None:
@@ -34,6 +57,7 @@ def log_call(argv) -> None:
         "ts": datetime.datetime.now(datetime.timezone.utc).isoformat(),
         "source": _SOURCE,
         "argv": [str(a) for a in argv],
+        "callers": _capture_callers(skip=2, max_depth=5),
     }
     line = (json.dumps(record, separators=(",", ":")) + "\n").encode()
     try:
