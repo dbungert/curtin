@@ -48,7 +48,7 @@ try:
 except NameError:
     FileMissingError = IOError
 
-from . import paths
+from . import paths, _dep_tracer
 from .log import LOG, log_call
 
 binary_type = bytes
@@ -81,6 +81,10 @@ def _subp(args, data=None, stdin=None, rcs=None, env=None, capture=False,
     if rcs is None:
         rcs = [0]
     devnull_fp = None
+
+    # Log the semantic command (before chroot/unshare wrapping) so that
+    # runtime observations can be compared against static analysis.
+    _dep_tracer.log_call(args if not isinstance(args, str) else [args])
 
     tpath = paths.target_path(target)
 
